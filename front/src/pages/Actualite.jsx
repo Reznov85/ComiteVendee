@@ -1,16 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import Header from "../components/Header";
-import axios from "axios";
+import api from "../api/axios";
+import "flowbite";
 
 const Actualites = () => {
   const [actualites, setActualites] = useState([]);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(null);
+  const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3000/actualite/all")
+  const token = localStorage.getItem("token");
+  if (token) {
+    try {
+      const payloadBase64 = token.split(".")[1];
+      const decodedPayload = JSON.parse(atob(payloadBase64));
+      setUserRole(decodedPayload.role); // <- clé "role" dans ton JWT
+    } catch (error) {
+      console.error("Erreur décodage JWT :", error);
+    }
+  }
+}, []);
+
+  useEffect(() => {
+    console.log("rôle décodé :", userRole)
+    api
+      .get("/actualite/all")
       .then((res) => {
         setActualites(res.data || []);
         setLoaded(true);
@@ -21,6 +36,7 @@ const Actualites = () => {
       });
   }, []);
 
+
   if (!loaded)
     return <h2 className="text-center mt-10 text-gray-500">Chargement...</h2>;
   if (error)
@@ -29,68 +45,74 @@ const Actualites = () => {
     return <h2 className="text-center mt-10">Aucune actualité trouvée</h2>;
 
   return (
-    <>
-      <Header />
+    <section className="max-w-screen-xl mx-auto mt-[180px] p-6">
+      <h1 className="text-4xl md:text-5xl font-bold text-center text-red-700 drop-shadow-lg mb-10">
+        Toutes les actualités
+      </h1>
 
-      {/* 🏁 En-tête de page */}
-      <div className="mt-[180px] sm:mt-[200px] md:mt-[220px] text-center mb-10">
-        <h1 className="text-4xl md:text-5xl font-bold text-red-700 drop-shadow-lg">
-          Toutes les actualités
-        </h1>
-        <p className="text-gray-600 mt-2">
-          Retrouvez l’ensemble des actualités du district de pétanque.
-        </p>
-      </div>
-
-      {/* 📰 Grille d’actualités */}
-      <section className="max-w-screen-xl mx-auto p-6">
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {actualites.map((actu) => (
-            <Link
-              to={`/actualite/${actu._id}`}
-              key={actu._id}
-              className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition block group"
-            >
+      <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+        {actualites.map((actu) => (
+          <div
+            key={actu._id}
+            className="bg-white border border-gray-200 rounded-2xl shadow-md hover:shadow-xl transition duration-300"
+          >
+            <Link to={`/actualite/${actu._id}`}>
               {actu.images && actu.images.length > 0 ? (
                 <img
-                  src={`http://localhost:3000${actu.images[0].url}`}
+                  src={`${api.defaults.baseURL}${actu.images[0].url}`}
                   alt={actu.images[0].description}
-                  className="w-full h-48 object-cover group-hover:scale-105 transition duration-500"
+                  className="rounded-t-2xl w-full h-56 object-cover hover:scale-105 transition duration-500"
                 />
               ) : (
-                <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500">
+                <div className="w-full h-56 bg-gray-100 flex items-center justify-center text-gray-500">
                   Pas d’image
                 </div>
               )}
-              <div className="p-5">
-                <h3 className="text-xl font-semibold text-red-700 mb-2">
-                  {actu.titre}
-                </h3>
-                <p className="text-gray-700 text-sm line-clamp-4">
-                  {actu.contenu}
-                </p>
-                <p className="text-xs text-gray-500 mt-3">
-                  Publiée le{" "}
-                  {new Date(actu.createdAt).toLocaleDateString("fr-FR")}
-                </p>
-              </div>
             </Link>
-          ))}
-        </div>
+            <div className="p-5">
+              <h5 className="mb-2 text-2xl font-bold tracking-tight text-red-700 hover:underline">
+                {actu.titre}
+              </h5>
+              <p className="mb-3 font-normal text-gray-700 line-clamp-4">
+                {actu.contenu}
+              </p>
+              <p className="text-xs text-gray-500 mb-4">
+                Publiée le{" "}
+                {new Date(actu.createdAt).toLocaleDateString("fr-FR")}
+              </p>
+              <Link
+                to={`/actualite/${actu._id}`}
+                className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300"
+              >
+                Lire la suite →
+              </Link>
+            </div>
+          </div>
+        ))}
+      </div>
 
-        {/* 🔙 Bouton retour */}
-        <div className="text-center mt-12">
+      <div className="text-center mt-16">
+        <Link
+          to="/"
+          className="inline-block text-white bg-gradient-to-r from-red-600 to-red-700 
+                     hover:from-red-700 hover:to-red-800 font-semibold 
+                     rounded-full px-6 py-3 shadow-md hover:shadow-lg transition duration-300"
+        >
+          ← Retour à l’accueil
+        </Link>
+
+        {userRole === "admin" && (
           <Link
-            to="/"
-            className="inline-block bg-red-600 text-white px-6 py-3 rounded-full 
-                       font-semibold shadow-md hover:bg-red-700 hover:shadow-lg 
-                       transition duration-300"
+            to="/actualite/new"
+            className="inline-block ml-4 text-white bg-gradient-to-r from-green-600 to-green-700 
+                       hover:from-green-700 hover:to-green-800 font-semibold 
+                       rounded-full px-6 py-3 shadow-md hover:shadow-lg transition duration-300"
           >
-            ← Retour à l’accueil
+            ➕ Créer une actualité
           </Link>
-        </div>
-      </section>
-    </>
+        )}
+      </div>
+    </section>
   );
 };
 

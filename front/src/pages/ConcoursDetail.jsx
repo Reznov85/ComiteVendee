@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axios";
 
 const ConcoursDetails = () => {
   const { id } = useParams();
@@ -8,8 +8,8 @@ const ConcoursDetails = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:3000/concours/${id}`)
+    api
+      .get(`/concours/${id}`)
       .then((res) => {
         setConcours(res.data);
         setLoading(false);
@@ -25,14 +25,14 @@ const ConcoursDetails = () => {
 
   return (
     <section className="max-w-screen-md mx-auto p-6">
-      <Link to="/calendrier" className="text-red-700 underline mb-4 inline-block">
-        ← Retour au calendrier
+      <Link to="/concours" className="text-red-700 underline mb-4 inline-block">
+        ← Retour aux concours
       </Link>
 
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
         {concours.affiche && (
           <img
-            src={`http://localhost:3000${concours.affiche}`}
+            src={`${api.defaults.baseURL}${concours.affiche}`}
             alt="Affiche concours"
             className="w-full h-64 object-cover"
           />

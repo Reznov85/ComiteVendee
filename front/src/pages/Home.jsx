@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom"; // ✅ Pour naviguer entre les pages (actualités, détails, etc.)
-import Header from "../components/Header"; // ✅ Ton composant d’en-tête commun
-import axios from "axios"; // ✅ Pour faire des requêtes HTTP vers ton backend Node.js
+import api from "../api/axios"; // ✅ Instance axios centralisée
 
 const Home = () => {
   // 🧠 États du composant
@@ -9,16 +8,16 @@ const Home = () => {
   const [loaded, setLoaded] = useState(false); // Indique si les données ont été chargées
   const [error, setError] = useState(null); // Contient un message d’erreur en cas d’échec de la requête
 
-  // ⚙️ useEffect → s’exécute au montage du composant
+  // ⚙️ useEffect → s'exécute au montage du composant
   useEffect(() => {
-    axios
-      .get("http://localhost:3000/actualite/all") // Appel API pour récupérer toutes les actualités
+    api
+      .get("/actualite/all") // Appel API pour récupérer toutes les actualités
       .then((res) => {
         setData(res.data || []); // Si la réponse contient des données, on les enregistre
         setLoaded(true); // Indique que le chargement est terminé
       })
       .catch((err) => {
-        setError(err.message || "Erreur"); // En cas d’erreur (serveur, réseau...)
+        setError(err.message || "Erreur"); // En cas d'erreur (serveur, réseau...)
         setLoaded(true);
       });
   }, []); // [] → exécuter une seule fois au montage
@@ -38,11 +37,8 @@ const Home = () => {
 
   return (
     <>
-      {/* 🔝 En-tête du site */}
-      <Header />
-
       {/* 🌅 Section bannière principale */}
-      <div className="relative w-full overflow-hidden mt-[180px] sm:mt-[200px] md:mt-[220px]">
+      <div className="relative w-full overflow-hidden">{/* mt-[180px] sm:mt-[200px] md:mt-[220px] supprimé car géré par Layout */}
         {/* Image de fond */}
         <img
           src="/images/banniere.png"
@@ -95,7 +91,7 @@ const Home = () => {
               {actu.images && actu.images.length > 0 && (
                 <div className="overflow-hidden">
                   <img
-                    src={`http://localhost:3000${actu.images[0].url}`}
+                    src={`${api.defaults.baseURL}${actu.images[0].url}`}
                     alt={actu.images[0].description}
                     className="w-full h-48 object-cover hover:scale-105 transition duration-500"
                   />

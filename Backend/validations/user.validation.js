@@ -14,8 +14,8 @@ export default function userValidation(body){
       email: joi.string().email(),
       password: joi.string(),
       nom: joi.string(),
-        prenom: joi.string().required(),
-      role: joi.string().required()
+        prenom: joi.string(),
+      role: joi.string()
 
     })
 

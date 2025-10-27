@@ -1,5 +1,5 @@
 import express from "express";
-import multer from "multer";
+import upload from "../middlewares/upload.js"; // ✅ middleware centralisé
 import {
   createActualite,
   getAllActualites,
@@ -7,27 +7,27 @@ import {
   updateActualite,
   deleteActualite,
 } from "../controllers/actualite.controller.js";
+import { auth, isAdmin } from "../middlewares/auth.js";
 
 const actualiteRoute = express.Router();
 
-// 📁 Config Multer pour enregistrer les fichiers dans /uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + file.originalname;
-    cb(null, uniqueSuffix);
-  },
-});
+/* ============================================================
+   📰 Routes CRUD Actualités avec upload d’images multiples
+   ============================================================ */
 
-const upload = multer({ storage });
+// 🆕 Créer une actualité (avec plusieurs images)
+actualiteRoute.post("/create", auth, isAdmin, upload.array("images", 10), createActualite);
 
-// ✅ Route avec upload multiple
-actualiteRoute.post("/create", upload.array("images", 10), createActualite);
+// 📋 Récupérer toutes les actualités
 actualiteRoute.get("/all", getAllActualites);
+
+// 🔍 Récupérer une actualité par ID
 actualiteRoute.get("/:id", getActualiteById);
+
+// ✏️ Mettre à jour une actualité (avec possibilité d’ajouter des images)
 actualiteRoute.put("/update/:id", upload.array("images", 10), updateActualite);
+
+// ❌ Supprimer une actualité
 actualiteRoute.delete("/delete/:id", deleteActualite);
 
 export default actualiteRoute;

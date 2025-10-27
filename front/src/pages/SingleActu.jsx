@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import Header from "../components/Header";
-import axios from "axios";
+import api from "../api/axios";
 
 const SingleActualite = () => {
   const { id } = useParams(); // Récupère l’ID de l’actualité depuis l’URL
@@ -10,8 +9,8 @@ const SingleActualite = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:3000/actualite/${id}`)
+    api
+      .get(`/actualite/${id}`)
       .then((res) => {
         setActu(res.data);
         setLoading(false);
@@ -31,13 +30,11 @@ const SingleActualite = () => {
 
   return (
     <>
-      <Header />
-
       {/* ✅ Image principale */}
-      <div className="relative w-full overflow-hidden mt-[180px] sm:mt-[200px] md:mt-[220px]">
-        {actu.images && actu.images.length > 0 ? (
+      <div className="relative w-full overflow-hidden">{/* mt-[180px] sm:mt-[200px] md:mt-[220px] supprimé car géré par Layout */}
+          {actu.images && actu.images.length > 0 ? (
           <img
-            src={`http://localhost:3000${actu.images[0].url}`}
+            src={`${api.defaults.baseURL}${actu.images[0].url}`}
             alt={actu.images[0].description}
             className="w-full h-[70vh] sm:h-[80vh] md:h-[85vh] object-cover object-top"
           />
@@ -65,7 +62,7 @@ const SingleActualite = () => {
             {actu.images.slice(1).map((img) => (
               <img
                 key={img._id}
-                src={`http://localhost:3000${img.url}`}
+                src={`${api.defaults.baseURL}${img.url}`}
                 alt={img.description}
                 className="rounded-lg shadow-md hover:scale-105 transition duration-300"
               />

@@ -3,13 +3,10 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import 'flowbite';
 import App from './App.jsx'
-import Header from './components/Header.jsx';
 import Footer from './components/Footer.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <Header />
     <App />
-    <Footer />
   </StrictMode>,
 )

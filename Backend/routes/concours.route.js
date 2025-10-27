@@ -1,6 +1,7 @@
 import express from "express";
 import multer from "multer";
 import { createConcours, getAllConcours, getConcoursById } from "../controllers/concours.controller.js";
+import { auth, isAdmin } from "../middlewares/auth.js";
 
 const concoursRoute = express.Router();
 
@@ -15,7 +16,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // ➕ Créer un concours avec image
-concoursRoute.post("/new", upload.single("affiche"), createConcours);
+concoursRoute.post("/new", upload.single("affiche"), auth, isAdmin, createConcours);
 
 // 📜 Tous les concours
 concoursRoute.get("/all", getAllConcours);

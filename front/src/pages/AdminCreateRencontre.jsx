@@ -1,0 +1,205 @@
+import { useState, useEffect } from "react";
+import axios from "axios";
+import "flowbite";
+import { useParams } from "react-router-dom";
+
+/**
+ * ⚔️ Formulaire d’administration : ajouter une rencontre à une journée
+ * --------------------------------------------------------------------
+ * Envoie les données vers POST /rencontre/create
+ */
+const AdminAddRencontre = () => {
+  const [journees, setJournees] = useState([]);
+  const [formData, setFormData] = useState({
+    equipeA: "",
+    equipeB: "",
+    scoreA: "",
+    scoreB: "",
+    horaire: "",
+    lieu: "",
+    partie: "",
+    journeeId: useParams().id,
+    
+  });
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // 🔹 Charger les journées existantes pour la liste déroulante
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/journee/all")
+      .then((res) => setJournees(res.data))
+      .catch((err) => console.error("Erreur chargement journées :", err));
+  }, []);
+
+  // ✏️ Gérer le changement des champs
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // 🚀 Soumettre le formulaire
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMessage("");
+    setLoading(true);
+
+    try {
+      const res = await axios.post("http://localhost:3000/rencontre/create", formData);
+      setMessage("✅ Rencontre ajoutée avec succès !");
+      setFormData({
+        equipeA: "",
+        equipeB: "",
+        scoreA: "",
+        scoreB: "",
+        horaire: "",
+        lieu: "",
+        partie: "",
+      });
+    } catch (err) {
+      console.error(err);
+      setMessage("❌ Erreur lors de l’ajout de la rencontre");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto p-6 mt-8 bg-white rounded-lg shadow-md border border-gray-200">
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">
+        ➕ Ajouter une rencontre
+      </h2>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* 🏆 Sélection de la journée */}
+      
+
+        {/* ⚔️ Équipes */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Équipe A :
+            </label>
+            <input
+              type="text"
+              name="equipeA"
+              value={formData.equipeA}
+              onChange={handleChange}
+              required
+              className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500"
+              placeholder="Ex : Belvérine"
+            />
+          </div>
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Équipe B :
+            </label>
+            <input
+              type="text"
+              name="equipeB"
+              value={formData.equipeB}
+              onChange={handleChange}
+              required
+              className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500"
+              placeholder="Ex : Aubigny"
+            />
+          </div>
+        </div>
+
+        {/* 🕓 Horaire + Lieu */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Horaire :
+            </label>
+            <input
+              type="text"
+              name="horaire"
+              value={formData.horaire}
+              onChange={handleChange}
+              placeholder="Ex : 14H30"
+              className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500"
+            />
+          </div>
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Lieu :
+            </label>
+            <input
+              type="text"
+              name="lieu"
+              value={formData.lieu}
+              onChange={handleChange}
+              required
+              placeholder="Ex : Saint-Gilles"
+              className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500"
+            />
+          </div>
+        </div>
+
+        {/* 🧮 Partie + Scores */}
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Partie :
+            </label>
+            <input
+              type="number"
+              name="partie"
+              value={formData.partie}
+              onChange={handleChange}
+              placeholder="1"
+              className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500"
+            />
+          </div>
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Score A :
+            </label>
+            <input
+              type="number"
+              name="scoreA"
+              value={formData.scoreA}
+              onChange={handleChange}
+              className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500"
+            />
+          </div>
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Score B :
+            </label>
+            <input
+              type="number"
+              name="scoreB"
+              value={formData.scoreB}
+              onChange={handleChange}
+              className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500"
+            />
+          </div>
+        </div>
+
+        {/* 🔘 Bouton d’envoi */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full text-white bg-cyan-700 hover:bg-cyan-800 focus:ring-4 focus:ring-cyan-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+        >
+          {loading ? "Enregistrement..." : "Ajouter la rencontre"}
+        </button>
+
+        {/* 📢 Message */}
+        {message && (
+          <p
+            className={`text-center mt-3 font-semibold ${
+              message.startsWith("✅") ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            {message}
+          </p>
+        )}
+      </form>
+    </div>
+  );
+};
+
+export default AdminAddRencontre;

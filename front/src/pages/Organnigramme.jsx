@@ -182,60 +182,64 @@ const Organigramme = () => {
           </h2>
 
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 text-gray-800 text-sm">
-            {/* Compétitions */}
-            <CommissionCard
-              title="🏆 Compétitions"
-              responsable="Hervé Barre"
-              adjoint="Luc Retureau"
-            />
+           
             {/* Jeunes */}
             <CommissionCard
-              title="🎯 Jeunes"
-              responsable="Luc Retureau"
-              adjoint="Jean-Marie Mehouas"
+              title="ETD & GROUPE JEUNES"
+              responsable="Régis GYPTEAU"
+              members={["Philippe ABADIE", "Hervé BARRE", "Alexandra DEBELLE", "Annie VERDON", "Nathalie PADIOLLEAU"]}
             />
             {/* Féminines */}
             <CommissionCard
-              title="👩‍🦰 Féminines"
-              responsable="Marie-Claude Gypteau"
-              adjoint="Jeanny Drapeau"
+              title="GROUPE FEMININ"
+              responsable="Annie VERDON"
+              members={["Hervé BARRE", "Alexandra DEBELLE", "Jeanny DRAPEAU", "Marie-Claude GYPTEAU", "Nathalie PADIOLLEAU"]}
+            />
+             {/* Seniors & Vétérans */}
+            <CommissionCard
+              title="👴 GROUPE SENIORS ET VETERANS"
+              responsable="Luc Retureau"
+              members={["Hervé BARRE", "Michel BELCOLLIN", "Jeany DRAPEAU", "Annie VERDON"]}
             />
             {/* Arbitrage */}
             <CommissionCard
-              title="⚖️ Arbitrage"
+              title="ARBITRAGE"
               responsable="Jean-Marie Mehouas"
-              adjoint="Patrice Guillet"
+              members={["Olivier BERLAND", "Jacky BELZ", "Jeanny DRAPEAU", "Régis GYPTEAU", "Laurent JOUFFRAIS"]}
             />
-            {/* Technique */}
-            <CommissionCard
-              title="💻 Technique & Informatique"
-              responsable="Patrice Guillet"
-              adjoint="Philippe Abadie"
-            />
-            {/* Seniors & Vétérans */}
-            <CommissionCard
-              title="👴 Seniors & Vétérans"
-              responsable="Luc Retureau"
-              adjoint="Hervé Barre"
-            />
-            {/* Communication */}
-            <CommissionCard
-              title="📣 Communication"
-              responsable="Philippe Abadie"
-              adjoint="Marie-Claude Gypteau"
-            />
-            {/* Évènements */}
-            <CommissionCard
-              title="📅 Évènements & Calendrier"
-              responsable="Jacky Drouet"
-              adjoint="Patrice Guillet"
-            />
+           
             {/* Discipline */}
             <CommissionCard
-              title="⚖️ Discipline & Éthique"
-              responsable="Marie-Claude Gypteau"
-              adjoint="Philippe Abadie"
+              title="📣 DISCIPLINE"
+              responsable="Annie VERDON"
+              members={["Olivier BERLAND", "Jeanny DRAPEAU", "Patrice Guillet"]}
             />
+              {/* Coupe de france et cdc */}
+            <CommissionCard
+              title="COUPE DE FRANCE ET CDC"
+              responsable="Hervé BARRE"
+              members={["Philippe ABADIE", "Patrice GUILLET", "Luc RETUREAU", "Régis GYPTEAU"]}
+            />
+                {/* Championnat et Jeu Provençal */}
+            <CommissionCard
+              title="CHAMPIONNAT PETANQUE JEU PROVENCAL"
+              responsable="Annie VERDON"
+              members={["Michel BELCOLLIN", "Alexandra DEBELLE", "Laurent JOUFFRAIS", "Luc RETUREAU"]}
+            />
+
+                <CommissionCard
+              title="COMMISSION CALENDRIER"
+              responsable=""
+              members={["Jean-Marie MEHOUAS", "Patrice GUILLET", "Luc RETUREAU"]}
+            />
+
+                    <CommissionCard
+              title="COMMISSION FINANCES REGLEMENTS & STATUTS"
+              responsable="Jacky DROUET"
+              members={["Olivier BERLAND", "Jacky BELZ" ,"Patrice GUILLET", "Jean-Marie MEHOUAS"]}
+            />
+      
+      
           </div>
         </div>
       </div>
@@ -250,15 +254,13 @@ const Organigramme = () => {
 /* ============================================================
    🎯 Composant CommissionCard
    ============================================================ */
-const CommissionCard = ({ title, responsable, adjoint }) => (
+const CommissionCard = ({ title, responsable, adjoint, members }) => (
   <div className="bg-green-50 border border-green-200 rounded-lg p-4 shadow-sm hover:shadow-md transition">
     <h3 className="font-bold text-green-700 text-lg mb-2">{title}</h3>
-    <p>
-      <strong>Responsable :</strong> {responsable}
-    </p>
-    <p>
-      <strong>Adjoint :</strong> {adjoint}
-    </p>
+    <p><strong>Président :</strong> {responsable}</p>
+    {members && members.length > 0 && (
+      <p><strong>Membres :</strong> {members.join(", ")}</p>
+    )}
   </div>
 );
 

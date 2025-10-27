@@ -4,7 +4,6 @@
 
 import Equipe from "../models/equipe.model.js";
 import Club from "../models/club.model.js";
-import Competition from "../models/competition.model.js";
 
 // =======================================
 // ➕ Créer une nouvelle équipe

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 
 const AdminConcoursForm = () => {
   const [form, setForm] = useState({
@@ -24,7 +24,7 @@ const AdminConcoursForm = () => {
       Object.keys(form).forEach((key) => data.append(key, form[key]));
       if (file) data.append("affiche", file);
 
-      await axios.post("http://localhost:3000/concours/new", data);
+  await api.post("/concours/new", data);
       setMessage("✅ Concours ajouté avec succès !");
       setForm({
         titre: "",

@@ -23,6 +23,12 @@ const userSchema = new mongoose.Schema({
       type: String,
       require: true
     },
+   role: {
+      type: String,
+      enum: ["admin", "user"], // valeurs possibles
+      default: "user",         // valeur par défaut
+      required: true,
+    },
      // Relation N️⃣-1️⃣ : un joueur appartient à un club
   club: { type: mongoose.Schema.Types.ObjectId, ref: "Club" },
 
