@@ -31,12 +31,17 @@ const ActualiteForm = () => {
     setMessage("");
 
     try {
+      const token = localStorage.getItem("token");
+      
       const formData = new FormData();
       Object.keys(data).forEach((key) => formData.append(key, data[key]));
       if (images) formData.append("images", images);
 
       await api.post("/actualite/create", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { 
+          "Content-Type": "multipart/form-data",
+          "Authorization": `Bearer ${token}`
+        },
       });
 
       setMessage("✅ Actualité enregistrée avec succès !");

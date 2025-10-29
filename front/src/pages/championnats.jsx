@@ -13,6 +13,28 @@ const Championnats = () => {
   const [championnats, setChampionnats] = useState([]);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  /* ------------------------------------------------------------
+     🔐 Vérification du rôle utilisateur
+     ------------------------------------------------------------ */
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const payloadBase64 = token.split(".")[1];
+        const decodedPayload = JSON.parse(atob(payloadBase64));
+        setUserRole(decodedPayload.role);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error("Erreur décodage JWT :", error);
+        setIsAuthenticated(false);
+      }
+    } else {
+      setIsAuthenticated(false);
+    }
+  }, []);
 
   /* ------------------------------------------------------------
      🔄 Chargement des championnats
@@ -22,6 +44,8 @@ const Championnats = () => {
     .then((res) => {
       setChampionnats(res.data || []);
       setLoaded(true);
+      // Nettoyer le flag de mise à jour après rechargement
+      localStorage.removeItem("championnatsNeedUpdate");
     })
     .catch((err) => {
       console.error("❌ Erreur Axios :", err);
@@ -29,6 +53,37 @@ const Championnats = () => {
       setLoaded(true);
     });
 }, []);
+
+  /* ------------------------------------------------------------
+     🔄 Recharger si une mise à jour est nécessaire
+     ------------------------------------------------------------ */
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && localStorage.getItem("championnatsNeedUpdate") === "true") {
+        // Recharger les championnats quand on revient sur la page
+        api.get("/championnat/all", { withCredentials: false })
+          .then((res) => {
+            setChampionnats(res.data || []);
+            localStorage.removeItem("championnatsNeedUpdate");
+            console.log("✅ Liste des championnats mise à jour");
+          })
+          .catch((err) => {
+            console.error("❌ Erreur lors de la mise à jour :", err);
+          });
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    
+    // Vérifier aussi au montage du composant
+    if (localStorage.getItem("championnatsNeedUpdate") === "true") {
+      handleVisibilityChange();
+    }
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
 
 
   /* ------------------------------------------------------------
@@ -59,9 +114,20 @@ const Championnats = () => {
   return (
     <div className="max-w-6xl mx-auto py-10 px-4">
       {/* 🏷️ Titre principal */}
-      <h1 className="text-3xl font-bold text-center text-cyan-700 mb-8 drop-shadow">
-        🏆 Liste des Championnats
-      </h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-cyan-700 drop-shadow">
+          🏆 Liste des Championnats
+        </h1>
+        {/* 🔒 Bouton visible UNIQUEMENT pour les admins connectés */}
+        {isAuthenticated && userRole === "admin" && (
+          <Link
+            to="/championnats/new"
+            className="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+          >
+            ➕ Ajouter un championnat
+          </Link>
+        )}
+      </div>
 
       {/* 🧱 Grille responsive */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

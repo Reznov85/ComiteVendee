@@ -86,6 +86,39 @@ export const createChampionnat = async (req, res) => {
 };
 
 /* ------------------------------------------------------------
+   ✏️ Modifier un championnat
+------------------------------------------------------------ */
+export const updateChampionnat = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nom, saison, categorie, dateDebut, dateFin } = req.body;
+
+    // Vérifie que le championnat existe
+    const championnat = await Championnat.findById(id);
+    if (!championnat) {
+      return res.status(404).json({ message: "Championnat introuvable" });
+    }
+
+    // Met à jour uniquement les champs fournis
+    const updatedChampionnat = await Championnat.findByIdAndUpdate(
+      id,
+      { nom, saison, categorie, dateDebut, dateFin },
+      { new: true, runValidators: true }
+    );
+
+    res.status(200).json({
+      message: "Championnat modifié avec succès",
+      championnat: updatedChampionnat
+    });
+  } catch (error) {
+    console.error("Erreur lors de la modification du championnat :", error);
+    res.status(500).json({ message: "Erreur serveur", error });
+  }
+};
+
+
+
+/* ------------------------------------------------------------
    🏁 Ajouter une journée à un championnat
 ------------------------------------------------------------ */
 export const addJournee = async (req, res) => {
@@ -192,6 +225,42 @@ export const findJourneeById = async (req, res) => {
       journee: journee
     });
   } catch (error) {
+    res.status(500).json({ message: "Erreur serveur", error });
+  }
+};
+
+/* ------------------------------------------------------------
+   🗑️ Supprimer une journée d'un championnat
+------------------------------------------------------------ */
+export const deleteJournee = async (req, res) => {
+  try {
+    const { championnatId, journeeId } = req.params;
+
+    // Récupère le championnat
+    const championnat = await Championnat.findById(championnatId);
+
+    if (!championnat) {
+      return res.status(404).json({ message: "Championnat introuvable" });
+    }
+
+    // Vérifie que la journée existe
+    const journee = championnat.journees.id(journeeId);
+    if (!journee) {
+      return res.status(404).json({ message: "Journée introuvable" });
+    }
+
+    // Supprime la journée du tableau embarqué
+    journee.deleteOne();
+
+    // Sauvegarde le championnat
+    await championnat.save();
+
+    res.status(200).json({ 
+      message: "Journée supprimée avec succès",
+      championnat
+    });
+  } catch (error) {
+    console.error("Erreur lors de la suppression de la journée :", error);
     res.status(500).json({ message: "Erreur serveur", error });
   }
 };

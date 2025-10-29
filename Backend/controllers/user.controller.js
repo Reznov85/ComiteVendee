@@ -46,8 +46,8 @@ const login = async(req, res) => {
             return res.status(400).json({message: "invalid invalides"})
         }
         res.status(200).json({
-            message: user.email+" is connected",
-            token: jwt.sign({ id: user._id, email:  user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: "12h" })
+            message: user.email+" est connecté avec succès",
+            token: jwt.sign({ id: user._id, email:  user.email, role: user.role }, process.env.SECRET_KEY, { expiresIn: "12h" })
         })
     } catch (error) {
         console.log(error)

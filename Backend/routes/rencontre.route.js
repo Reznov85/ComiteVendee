@@ -19,6 +19,6 @@ rencontreRoute.get("/all", getAllRencontres);
 rencontreRoute.get("/:id", getRencontreById);
 rencontreRoute.put("/update/:id", updateRencontre);
 rencontreRoute.delete("/delete/:id", deleteRencontre);
-router.put("/:id/score", updateScore);
+rencontreRoute.put("/:id/score", updateScore);
 
 export default rencontreRoute;

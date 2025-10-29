@@ -9,18 +9,60 @@ const Actualites = () => {
   const [error, setError] = useState(null);
   const [userRole, setUserRole] = useState(null);
 
+  /**
+   * 🔐 EFFET 1 : VÉRIFICATION DU RÔLE UTILISATEUR
+   * =============================================
+   * 
+   * Ce useEffect s'exécute UNE SEULE FOIS au montage du composant (grâce au [])
+   * Son rôle : Vérifier si l'utilisateur connecté est un admin
+   * 
+   * 🎯 POURQUOI ?
+   * Pour afficher le bouton "➕ Créer une actualité" UNIQUEMENT aux admins
+   * (voir plus bas dans le JSX : {userRole === "admin" && ...})
+   */
   useEffect(() => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    try {
-      const payloadBase64 = token.split(".")[1];
-      const decodedPayload = JSON.parse(atob(payloadBase64));
-      setUserRole(decodedPayload.role); // <- clé "role" dans ton JWT
-    } catch (error) {
-      console.error("Erreur décodage JWT :", error);
+    // 📦 ÉTAPE 1 : Récupérer le token JWT depuis le localStorage
+    // Le token a été stocké lors de la connexion (voir Login.jsx)
+    const token = localStorage.getItem("token");
+    
+    // ✅ ÉTAPE 2 : Vérifier si un token existe
+    if (token) {
+      try {
+        // 🔍 ÉTAPE 3 : Décoder le token JWT pour extraire les informations
+        
+        // Un JWT est composé de 3 parties séparées par des points : header.payload.signature
+        // Exemple : "eyJhbGci.eyJpZCI6IjEyMy.SflKxwRJ"
+        //           ^^^^^^^^  ^^^^^^^^^^  ^^^^^^^^^^
+        //           [0]       [1]         [2]
+        //           header    PAYLOAD     signature
+        
+        // On récupère la partie [1] (payload) qui contient les données utilisateur
+        const payloadBase64 = token.split(".")[1];
+        
+        // 🔄 ÉTAPE 4 : Décoder le payload (qui est en base64)
+        // atob() = fonction JavaScript pour décoder du base64
+        // JSON.parse() = convertir la chaîne JSON en objet JavaScript
+        const decodedPayload = JSON.parse(atob(payloadBase64));
+        
+        // 💾 ÉTAPE 5 : Extraire le rôle et le stocker dans l'état
+        // Le payload contient des infos comme : { id: "123", email: "user@mail.com", role: "admin" }
+        setUserRole(decodedPayload.role); // On extrait juste le "role"
+        
+      } catch (error) {
+        // ❌ Si le token est invalide ou corrompu, on affiche l'erreur
+        console.error("Erreur décodage JWT :", error);
+        // userRole reste null, donc les boutons admin ne s'afficheront pas
+      }
     }
-  }
-}, []);
+    // Si pas de token, userRole reste null (utilisateur non connecté)
+    
+  }, []); // [] = s'exécute qu'une seule fois au montage du composant
+
+  /**
+   * 🔄 EFFET 2 : CHARGEMENT DES ACTUALITÉS
+   * =======================================
+   * Ce useEffect récupère toutes les actualités depuis l'API
+   */
 
   useEffect(() => {
     console.log("rôle décodé :", userRole)

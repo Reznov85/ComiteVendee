@@ -47,3 +47,30 @@ export const createJournee = async (req, res) => {
     res.status(400).json({ message: "Erreur lors de la création", error });
   }
 };
+/* ------------------------------------------------------------
+   🗑️ Supprimer une journée
+------------------------------------------------------------ */
+export const deleteJournee = async (req, res) => {
+  try {
+    // Récupère la journée avant de la supprimer pour avoir l'ID du championnat
+    const journee = await Journee.findById(req.params.id);
+    
+    if (!journee) {
+      return res.status(404).json({ message: 'Journée non trouvée' });
+    }
+
+    // Supprime la référence de la journée dans le championnat parent
+    await Championnat.findByIdAndUpdate(
+      journee.championnat,
+      { $pull: { journees: journee._id } }
+    );
+
+    // Supprime la journée
+    await Journee.findByIdAndDelete(req.params.id);
+    
+    res.status(200).json({ message: 'Journée supprimée avec succès' });
+  } catch (error) {
+    console.error("Erreur lors de la suppression de la journée :", error);
+    res.status(500).json({ message: 'Erreur serveur', error: error.message });
+  }
+};
