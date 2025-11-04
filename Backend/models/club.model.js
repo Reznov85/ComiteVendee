@@ -12,6 +12,21 @@ const clubSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    adresseTerrain: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    president: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    telephone: {
+      type: String,
+      required: false,
+      trim: true,
+    },
     codePostal: {
       type: Number,
       required: false,

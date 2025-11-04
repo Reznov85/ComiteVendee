@@ -1,95 +1,99 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import api from "../api/axios";
 
 /* ============================================================
    🗂️ Données de l’organigramme (2024-2028)
    ============================================================ */
-const orgData = [
-  {
-    id: "presidente",
-    name: "Marie-Claude Gypteau",
-    role: "Présidente",
-    photo: "/images/membres/marie-claude.jpg",
-    reportsTo: null,
-  },
-  {
-    id: "vice1",
-    name: "Jean-Marie Mehouas",
-    role: "Vice-Président Délégué",
-    photo: "/images/membres/jean-marie.jpg",
-    reportsTo: "presidente",
-  },
-  {
-    id: "vice2",
-    name: "Patrice Guillet",
-    role: "Vice-Président",
-    photo: "/images/membres/patrice.jpg",
-    reportsTo: "presidente",
-  },
-  {
-    id: "vice3",
-    name: "Luc Retureau",
-    role: "Vice-Président",
-    photo: "/images/membres/luc.jpg",
-    reportsTo: "presidente",
-  },
-  {
-    id: "secretaire",
-    name: "Philippe Abadie",
-    role: "Secrétaire Général",
-    photo: "/images/membres/philippe.jpg",
-    reportsTo: "presidente",
-  },
-  {
-    id: "secretaireAdj",
-    name: "Jeanny Drapeau",
-    role: "Secrétaire Adjointe",
-    photo: "/images/membres/jeanny.jpg",
-    reportsTo: "secretaire",
-  },
-  {
-    id: "tresorier",
-    name: "Jacky Drouet",
-    role: "Trésorier",
-    photo: "/images/membres/jacky.jpg",
-    reportsTo: "presidente",
-  },
-  {
-    id: "tresorierAdj",
-    name: "Patrice Guillet",
-    role: "Trésorier Adjoint",
-    photo: "/images/membres/patrice.jpg",
-    reportsTo: "tresorier",
-  },
-  {
-    id: "directionSportive",
-    name: "Hervé Barre",
-    role: "Directeur Sportif",
-    photo: "/images/membres/herve.jpg",
-    reportsTo: "presidente",
-  },
-];
+// const orgData = [
+//   {
+//     fonctionId: "presidente",
+//     nom: "Marie-Claude Gypteau",
+//     fonction: "Présidente",
+//     photo: "/images/membres/marie-claude.jpg",
+//     reportsTo: null,
+//   },
+//   {
+//     fonctionId: "vice1",
+//     nom: "Jean-Marie Mehouas",
+//     fonction: "Vice-Président Délégué",
+//     photo: "/images/membres/jean-marie.jpg",
+//     reportsTo: "presidente",
+//   },
+//   {
+//     fonctionId: "vice2",
+//     nom: "Patrice Guillet",
+//     fonction: "Vice-Président",
+//     photo: "/images/membres/patrice.jpg",
+//     reportsTo: "presidente",
+//   },
+//   {
+//     fonctionId: "vice3",
+//     nom: "Luc Retureau",
+//     fonction: "Vice-Président",
+//     photo: "/images/membres/luc.jpg",
+//     reportsTo: "presidente",
+//   },
+//   {
+//     fonctionId: "secretaire",
+//     nom: "Philippe Abadie",
+//     fonction: "Secrétaire Général",
+//     photo: "/images/membres/philippe.jpg",
+//     reportsTo: "presidente",
+//   },
+//   {
+//     fonctionId: "secretaireAdj",
+//     nom: "Jeanny Drapeau",
+//     fonction: "Secrétaire Adjointe",
+//     photo: "/images/membres/jeanny.jpg",
+//     reportsTo: "secretaire",
+//   },
+//   {
+//     fonctionId: "tresorier",
+//     nom: "Jacky Drouet",
+//     fonction: "Trésorier",
+//     photo: "/images/membres/jacky.jpg",
+//     reportsTo: "presidente",
+//   },
+//   {
+//     fonctionId: "tresorierAdj",
+//     nom: "Patrice Guillet",
+//     fonction: "Trésorier Adjoint",
+//     photo: "/images/membres/patrice.jpg",
+//     reportsTo: "tresorier",
+//   },
+//   {
+//     fonctionId: "directionSportive",
+//     nom: "Hervé Barre",
+//     fonction: "Directeur Sportif",
+//     photo: "/images/membres/herve.jpg",
+//     reportsTo: "presidente",
+//   },
+// ];
+
 
 /* ============================================================
-   ⚙️ Construction hiérarchique
-   ============================================================ */
+ ⚙️ Construction hiérarchique
+ ============================================================ */
 const buildTree = (data) => {
-  const map = {};
-  data.forEach((item) => (map[item.id] = { ...item, children: [] }));
+  console.log(data)
+  const map = [];
+  data.forEach((item) => {if(item.fonction){map[item.fonctionId] = { ...item, children: [] }}});
   const roots = [];
   data.forEach((item) => {
     if (item.reportsTo) {
-      map[item.reportsTo]?.children.push(map[item.id]);
+      map[item.reportsTo]?.children.push(map[item.fonctionId]);
     } else {
-      roots.push(map[item.id]);
+      roots.push(map[item.fonctionId]);
     }
   });
+  console.log(map)
   return roots;
 };
 
 /* ============================================================
    🧱 Carte d’un membre
    ============================================================ */
-const OrgNode = ({ name, role, photo }) => (
+const OrgNode = ({ nom, fonction, photo }) => (
   <div
     className="bg-white border-2 border-green-700 rounded-xl shadow-md text-center 
                p-4 w-52 min-w-[180px] transition hover:shadow-lg hover:scale-105"
@@ -97,12 +101,12 @@ const OrgNode = ({ name, role, photo }) => (
     {photo && (
       <img
         src={photo}
-        alt={name}
+        alt={nom}
         className="w-20 h-20 rounded-full object-cover mx-auto mb-3 border-2 border-green-700"
       />
     )}
-    <h3 className="text-green-800 font-bold text-lg">{name}</h3>
-    <p className="text-gray-700 text-sm">{role}</p>
+    <h3 className="text-green-800 font-bold text-lg">{nom}</h3>
+    <p className="text-gray-700 text-sm">{fonction}</p>
   </div>
 );
 
@@ -111,7 +115,7 @@ const OrgNode = ({ name, role, photo }) => (
    ============================================================ */
 const OrgChart = ({ node }) => (
   <div className="flex flex-col items-center">
-    <OrgNode name={node.name} role={node.role} photo={node.photo} />
+    <OrgNode nom={node.nom} fonction={node.fonction} photo={node.photo} />
 
     {node.children?.length > 0 && (
       <>
@@ -122,7 +126,7 @@ const OrgChart = ({ node }) => (
                      sm:flex-nowrap sm:flex-row"
         >
           {node.children.map((child) => (
-            <div key={child.id} className="flex flex-col items-center">
+            <div key={child._id} className="flex flex-col items-center">
               <div className="hidden sm:block w-full h-0.5 bg-green-700 mb-2"></div>
               <OrgChart node={child} />
             </div>
@@ -137,7 +141,22 @@ const OrgChart = ({ node }) => (
    🧭 Page principale Organigramme
    ============================================================ */
 const Organigramme = () => {
-  const tree = useMemo(() => buildTree(orgData), []);
+const [orgData, setOrgData] = useState([]);
+const[error,setError]=useState(null);
+const[loaded,setLoaded]=useState(false);
+useEffect(() => {
+    api
+      .get("/utilisateur/all")
+      .then((res) => {
+        setOrgData(res.data);
+        setLoaded(true);
+      })
+      .catch((err) => {
+        setError(err.message || "Erreur lors du chargement des utilisateurs");
+        setLoaded(true);
+      });
+  }, []);
+  const tree = useMemo(() => buildTree(orgData), [orgData]);
   const [showCommissions, setShowCommissions] = useState(false);
 
   return (
@@ -149,7 +168,7 @@ const Organigramme = () => {
       <div className="overflow-x-auto">
         <div className="flex justify-center">
           {tree.map((root) => (
-            <OrgChart key={root.id} node={root} />
+            <OrgChart key={root._id} node={root} />
           ))}
         </div>
       </div>
@@ -167,11 +186,10 @@ const Organigramme = () => {
 
       {/* 🧩 Section commissions animée */}
       <div
-        className={`transition-all duration-700 ease-in-out transform ${
-          showCommissions
+        className={`transition-all duration-700 ease-in-out transform ${showCommissions
             ? "opacity-100 translate-y-0 max-h-[1500px] mt-10"
             : "opacity-0 -translate-y-6 max-h-0 overflow-hidden"
-        }`}
+          }`}
       >
         <div
           className="bg-white border-2 border-green-700 rounded-xl 
@@ -182,7 +200,7 @@ const Organigramme = () => {
           </h2>
 
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 text-gray-800 text-sm">
-           
+
             {/* Jeunes */}
             <CommissionCard
               title="ETD & GROUPE JEUNES"
@@ -195,7 +213,7 @@ const Organigramme = () => {
               responsable="Annie VERDON"
               members={["Hervé BARRE", "Alexandra DEBELLE", "Jeanny DRAPEAU", "Marie-Claude GYPTEAU", "Nathalie PADIOLLEAU"]}
             />
-             {/* Seniors & Vétérans */}
+            {/* Seniors & Vétérans */}
             <CommissionCard
               title="👴 GROUPE SENIORS ET VETERANS"
               responsable="Luc Retureau"
@@ -207,39 +225,39 @@ const Organigramme = () => {
               responsable="Jean-Marie Mehouas"
               members={["Olivier BERLAND", "Jacky BELZ", "Jeanny DRAPEAU", "Régis GYPTEAU", "Laurent JOUFFRAIS"]}
             />
-           
+
             {/* Discipline */}
             <CommissionCard
               title="📣 DISCIPLINE"
               responsable="Annie VERDON"
               members={["Olivier BERLAND", "Jeanny DRAPEAU", "Patrice Guillet"]}
             />
-              {/* Coupe de france et cdc */}
+            {/* Coupe de france et cdc */}
             <CommissionCard
               title="COUPE DE FRANCE ET CDC"
               responsable="Hervé BARRE"
               members={["Philippe ABADIE", "Patrice GUILLET", "Luc RETUREAU", "Régis GYPTEAU"]}
             />
-                {/* Championnat et Jeu Provençal */}
+            {/* Championnat et Jeu Provençal */}
             <CommissionCard
               title="CHAMPIONNAT PETANQUE JEU PROVENCAL"
               responsable="Annie VERDON"
               members={["Michel BELCOLLIN", "Alexandra DEBELLE", "Laurent JOUFFRAIS", "Luc RETUREAU"]}
             />
 
-                <CommissionCard
+            <CommissionCard
               title="COMMISSION CALENDRIER"
               responsable=""
               members={["Jean-Marie MEHOUAS", "Patrice GUILLET", "Luc RETUREAU"]}
             />
 
-                    <CommissionCard
+            <CommissionCard
               title="COMMISSION FINANCES REGLEMENTS & STATUTS"
               responsable="Jacky DROUET"
-              members={["Olivier BERLAND", "Jacky BELZ" ,"Patrice GUILLET", "Jean-Marie MEHOUAS"]}
+              members={["Olivier BERLAND", "Jacky BELZ", "Patrice GUILLET", "Jean-Marie MEHOUAS"]}
             />
-      
-      
+
+
           </div>
         </div>
       </div>

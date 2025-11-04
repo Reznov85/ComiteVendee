@@ -13,24 +13,36 @@ const userSchema = new mongoose.Schema({
     },
     nom: {
       type: String,
-      require:true
+      required: true
     },
     prenom: {
       type: String,
-      require: true
+      required: true
+    },
+    fonctionId: {
+      type: String,
+      required: false
     },
     fonction: {
       type: String,
-      require: true
+      required: false
     },
    role: {
       type: String,
-      enum: ["admin", "user"], // valeurs possibles
+      enum: ["admin", "user", "comite"], // valeurs possibles
       default: "user",         // valeur par défaut
       required: true,
     },
+    photo: {
+      type: String,
+      required: false
+    },
+
      // Relation N️⃣-1️⃣ : un joueur appartient à un club
   club: { type: mongoose.Schema.Types.ObjectId, ref: "Club" },
+
+  // 🔽 Nouveau champ pour hiérarchie organigramme :
+  reportsTo: { type: String, default: null },
 
 }, { timestamps: true });
 

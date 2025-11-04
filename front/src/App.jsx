@@ -13,6 +13,7 @@ import SingleClub from "./pages/SingleClub"
 import ActualiteForm from "./pages/ActualiteForm"
 import Login from "./pages/Login"
 import ClubForm from "./pages/clubForm"
+import ClubEditForm from "./pages/ClubEditForm"
 import CalendrierConcours from "./pages/CalendrierConcours"
 import AdminConcoursForm from "./pages/ConcoursForm"
 import AdminCreateChampionnat from "./pages/AdminCreateChampionnat"
@@ -22,6 +23,7 @@ import AdminAddJournee from "./pages/AdminCreateJournee"
 import AdminAddRencontre from "./pages/AdminCreateRencontre"
 import JourneeDetails from "./pages/JourneeSingle"
 import Classement from "./pages/Classement"
+import RechercheClubsLive from "./pages/RechercheClubsLive"
 
 
 function App() {
@@ -45,6 +47,7 @@ function App() {
           <Route path="/championnat/:id" element={<ChampionnatDetails />} />
           <Route path="/journee/:id" element={<JourneeDetails />} />
           <Route path="/championnat/:id/classement" element={<Classement />} />
+          <Route path="/rechercheClubs" element={<RechercheClubsLive />} />
 
 
 
@@ -68,6 +71,14 @@ function App() {
             element={
               <ProtectedRoute requireAdmin={true}>
                 <ClubForm />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/clubs/edit/:id" 
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <ClubEditForm />
               </ProtectedRoute>
             } 
           />

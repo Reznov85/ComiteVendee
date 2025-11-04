@@ -7,6 +7,9 @@ import fs from "fs";
 export const createClub = async (req, res) => {
   try {
     console.log("📩 Body reçu :", req.body);
+    console.log("📄 File reçu :", req.file);
+    console.log("🔍 Headers :", req.headers['content-type']);
+    console.log("🗂️ Toutes les clés du body :", Object.keys(req.body));
 
     // ✅ Validation Joi
     const { clubCreate } = clubValidation(req.body);
@@ -22,6 +25,9 @@ export const createClub = async (req, res) => {
     const newClub = new Club({
       nom: req.body.nom,
       adresse: req.body.adresse,
+      adresseTerrain: req.body.adresseTerrain,
+      president: req.body.president,
+      telephone: req.body.telephone,
       codePostal: req.body.codePostal,
       ville: req.body.ville,
       email: req.body.email,
@@ -117,3 +123,24 @@ export const deleteClub = async (req, res) => {
     res.status(500).json({ message: "Erreur lors de la suppression du club", error });
   }
 };
+// Exemple contrôleur Express
+export const createMultipleClubs = async (req, res) => {
+  try {
+    const clubs = req.body.clubs;
+    if (!Array.isArray(clubs)) {
+      return res.status(400).json({ message: "Le champ 'clubs' doit être un tableau." });
+    }
+
+    // Validation Joi sur chaque club
+    for (const club of clubs) {
+      const { error } = clubValidation(club);
+      if (error) return res.status(400).json({ errors: error.details.map(d => d.message) });
+    }
+
+    const inserted = await Club.insertMany(clubs);
+    res.status(201).json({ message: "Clubs créés avec succès", data: inserted });
+  } catch (err) {
+    res.status(500).json({ message: "Erreur serveur", error: err.message });
+  }
+};
+

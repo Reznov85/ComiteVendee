@@ -64,6 +64,8 @@ export const deleteJournee = async (req, res) => {
       journee.championnat,
       { $pull: { journees: journee._id } }
     );
+    console.log(journee.championnat)
+
 
     // Supprime la journée
     await Journee.findByIdAndDelete(req.params.id);

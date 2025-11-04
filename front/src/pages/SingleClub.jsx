@@ -7,8 +7,22 @@ const SingleClub = () => {
   const [club, setClub] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
+    // Vérifier le rôle de l'utilisateur
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const payloadBase64 = token.split(".")[1];
+        const decodedPayload = JSON.parse(atob(payloadBase64));
+        setUserRole(decodedPayload.role);
+      } catch (error) {
+        console.error("Erreur décodage JWT :", error);
+      }
+    }
+
+    // Charger les données du club
     api
       .get(`/club/${id}`)
       .then((res) => {
@@ -65,6 +79,13 @@ const SingleClub = () => {
               </h2>
               
               <div className="space-y-3">
+                {club.president && (
+                  <div className="flex items-start">
+                    <span className="font-semibold text-gray-600 w-32">Président(e) :</span>
+                    <span className="text-gray-800">{club.president}</span>
+                  </div>
+                )}
+                
                 <div className="flex items-start">
                   <span className="font-semibold text-gray-600 w-32">Adresse :</span>
                   <span className="text-gray-800">{club.adresse}</span>
@@ -75,6 +96,13 @@ const SingleClub = () => {
                   <span className="text-gray-800">{club.codePostal} {club.ville}</span>
                 </div>
                 
+                {club.adresseTerrain && (
+                  <div className="flex items-start">
+                    <span className="font-semibold text-gray-600 w-32">Terrain :</span>
+                    <span className="text-gray-800">{club.adresseTerrain}</span>
+                  </div>
+                )}
+                
                 {club.email && (
                   <div className="flex items-start">
                     <span className="font-semibold text-gray-600 w-32">Email :</span>
@@ -83,6 +111,18 @@ const SingleClub = () => {
                       className="text-blue-600 hover:text-blue-800 underline"
                     >
                       {club.email}
+                    </a>
+                  </div>
+                )}
+                
+                {club.telephone && (
+                  <div className="flex items-start">
+                    <span className="font-semibold text-gray-600 w-32">Téléphone :</span>
+                    <a 
+                      href={`tel:${club.telephone}`}
+                      className="text-blue-600 hover:text-blue-800 underline"
+                    >
+                      {club.telephone}
                     </a>
                   </div>
                 )}
@@ -120,13 +160,22 @@ const SingleClub = () => {
           </div>
 
           {/* Bouton retour */}
-          <div className="text-center mt-8">
+          <div className="flex justify-center gap-4 mt-8">
             <Link
               to="/clubs"
               className="inline-block bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300"
             >
               ← Retour aux clubs
             </Link>
+            
+            {userRole === "admin" && (
+              <Link
+                to={`/clubs/edit/${club._id}`}
+                className="inline-block bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300"
+              >
+                ✏️ Modifier le club
+              </Link>
+            )}
           </div>
         </div>
       </section>

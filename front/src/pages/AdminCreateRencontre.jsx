@@ -15,7 +15,7 @@ const AdminAddRencontre = () => {
     equipeB: "",
     scoreA: "",
     scoreB: "",
-    horaire: "",
+    date: "",
     lieu: "",
     partie: "",
     journeeId: useParams().id,
@@ -45,20 +45,34 @@ const AdminAddRencontre = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:3000/rencontre/create", formData);
+      // 📋 Préparer les données en nettoyant les valeurs vides
+      const dataToSend = {
+        equipeA: formData.equipeA,
+        equipeB: formData.equipeB,
+        date: formData.date,
+        lieu: formData.lieu,
+        journeeId: formData.journeeId,
+        // N'envoyer scoreA/scoreB/partie que s'ils ont une valeur
+        ...(formData.scoreA && { scoreA: Number(formData.scoreA) }),
+        ...(formData.scoreB && { scoreB: Number(formData.scoreB) }),
+        ...(formData.partie && { partie: Number(formData.partie) }),
+      };
+      
+      const res = await axios.post("http://localhost:3000/rencontre/create", dataToSend);
       setMessage("✅ Rencontre ajoutée avec succès !");
       setFormData({
         equipeA: "",
         equipeB: "",
         scoreA: "",
         scoreB: "",
-        horaire: "",
+        date: "",
         lieu: "",
         partie: "",
+        journeeId: formData.journeeId, // ✅ Garder le journeeId
       });
     } catch (err) {
-      console.error(err);
-      setMessage("❌ Erreur lors de l’ajout de la rencontre");
+      console.error("Erreur lors de l'ajout de la rencontre:", err);
+      setMessage("❌ Erreur : " + (err.response?.data?.message || err.message));
     } finally {
       setLoading(false);
     }
@@ -106,35 +120,35 @@ const AdminAddRencontre = () => {
           </div>
         </div>
 
-        {/* 🕓 Horaire + Lieu */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">
-              Horaire :
-            </label>
-            <input
-              type="text"
-              name="horaire"
-              value={formData.horaire}
-              onChange={handleChange}
-              placeholder="Ex : 14H30"
-              className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500"
-            />
-          </div>
-          <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">
-              Lieu :
-            </label>
-            <input
-              type="text"
-              name="lieu"
-              value={formData.lieu}
-              onChange={handleChange}
-              required
-              placeholder="Ex : Saint-Gilles"
-              className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500"
-            />
-          </div>
+        {/* � Date et heure */}
+        <div>
+          <label className="block mb-2 text-sm font-medium text-gray-700">
+            Date et heure de la rencontre :
+          </label>
+          <input
+            type="datetime-local"
+            name="date"
+            value={formData.date}
+            onChange={handleChange}
+            required
+            className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500"
+          />
+        </div>
+
+        {/* 📍 Lieu */}
+        <div>
+          <label className="block mb-2 text-sm font-medium text-gray-700">
+            Lieu :
+          </label>
+          <input
+            type="text"
+            name="lieu"
+            value={formData.lieu}
+            onChange={handleChange}
+            required
+            placeholder="Ex : Terrain 1, Boulodrome..."
+            className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500"
+          />
         </div>
 
         {/* 🧮 Partie + Scores */}

@@ -12,6 +12,7 @@ import concoursRoute from "./routes/concours.route.js";
 import championnatRoute from "./routes/championnat.route.js";
 import journeeRoute from "./routes/journee.route.js";
 import rencontreRoute from "./routes/rencontre.route.js";
+import organigrammeRoute from "./routes/organigramme.route.js";
 
 
 dotenv.config();
@@ -42,6 +43,7 @@ app.use("/concours", concoursRoute)
 app.use("/championnat", championnatRoute);
 app.use("/journee", journeeRoute);
 app.use("/rencontre", rencontreRoute);
+app.use("/organigramme", organigrammeRoute);
 
 
 

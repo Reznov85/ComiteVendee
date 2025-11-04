@@ -126,7 +126,10 @@ const JourneeDetails = () => {
                         {r.equipeA} 🆚 {r.equipeB}
                       </p>
                       <p className="text-sm text-gray-500">
-                        Terrain : {r.terrain || "non défini"}
+                        Lieu : {r.lieu || "non défini"}
+                      </p>
+                    <p className="text-xs text-gray-400">
+                        {r.date ? `${new Date(r.date).toLocaleDateString("fr-FR")} à ${new Date(r.date).toLocaleTimeString("fr-FR", { hour: '2-digit', minute: '2-digit' })}` : "Date/heure non définies"}
                       </p>
                     </div>
                     {/* Affichage du score ou du formulaire d'édition */}
@@ -193,7 +196,10 @@ const JourneeDetails = () => {
                         {r.equipeA} 🆚 {r.equipeB}
                       </p>
                       <p className="text-sm text-gray-500">
-                        Terrain : {r.terrain || "non défini"}
+                        Lieu : {r.lieu || "non défini"}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {r.date ? `${new Date(r.date).toLocaleDateString("fr-FR")} à ${new Date(r.date).toLocaleTimeString("fr-FR", { hour: '2-digit', minute: '2-digit' })}` : "Date/heure non définies"}
                       </p>
                     </div>
                     {/* Affichage du score ou du formulaire d'édition */}

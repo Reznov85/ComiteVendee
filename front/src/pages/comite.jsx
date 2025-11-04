@@ -3,33 +3,33 @@ import React from "react";
 const Comite = () => {
   // 🏆 Bureau directeur
   const bureau = [
-    { nom: "Marie-Claude Gypteau", role: "Présidente", photo: "/images/membres/marie-claude.jpg" },
-    { nom: "Jean-Marie Mehouas", role: "Vice-Président Délégué", photo: "/images/membres/jean-marie.jpg" },
-    { nom: "Patrice Guillet", role: "Vice-Président et Trésorier adjoint", photo: "/images/membres/patrice.jpg" },
-    { nom: "Luc Retureau", role: "Vice-Président", photo: "/images/membres/luc.jpg" },
-    { nom: "Philippe Abadie", role: "Secrétaire Général", photo: "/images/membres/philippe.jpg" },
-    { nom: "Jeanny Drapeau", role: "Secrétaire Adjointe", photo: "/images/membres/jeanny.jpg" },
-    { nom: "Jacky Drouet", role: "Trésorier Général", photo: "/images/membres/jacky.jpg" },
+    { nom: "Marie-Claude Gypteau", role: "Présidente", photo: "/images/femme.png" },
+    { nom: "Jean-Marie Mehouas", role: "Vice-Président Délégué", photo: "/images/homme.png" },
+    { nom: "Patrice Guillet", role: "Vice-Président et Trésorier adjoint", photo: "/images/homme.png" },
+    { nom: "Luc Retureau", role: "Vice-Président", photo: "/images/homme.png" },
+    { nom: "Philippe Abadie", role: "Secrétaire Général", photo: "/images/homme.png" },
+    { nom: "Jeanny Drapeau", role: "Secrétaire Adjointe", photo: "/images/femme.png" },
+    { nom: "Jacky Drouet", role: "Trésorier Général", photo: "/images/homme.png" },
   ];
 
   // 🏅 Présidents de district
   const presidentsDistrict = [
-    { nom: "Jean-Marie Mehouas", district: "District de Fontenay", photo: "/images/membres/jean-marie.jpg" },
-    { nom: "Patrice Guillet", district: "District de La Roche", photo: "/images/membres/patrice.jpg" },
-    { nom: "Luc Retureau", district: "District des Sables", photo: "/images/membres/luc.jpg" },
+    { nom: "Jean-Marie Mehouas", district: "District de Fontenay", photo: "/images/homme.png" },
+    { nom: "Patrice Guillet", district: "District de La Roche", photo: "/images/homme.png" },
+    { nom: "Luc Retureau", district: "District des Sables", photo: "/images/homme.png" },
   ];
 
-  // 👥 Conseil d'administration
+
   const conseil = [
-    { nom: "Hervé Barre", photo: "/images/membres/herve.jpg" },
-    { nom: "Michel Belcollin", photo: "/images/membres/michel.jpg" },
-    { nom: "Olivier Berland", photo: "/images/membres/olivier.jpg" },
-    { nom: "Jacky Belz", photo: "/images/membres/jacky-belz.jpg" },
-    { nom: "Alexandra Debelle", photo: "/images/membres/alexandra.jpg" },
-    { nom: "Régis Gypteau", photo: "/images/membres/regis.jpg" },
-    { nom: "Laurent Jouffrais", photo: "/images/membres/laurent.jpg" },
-    { nom: "Nathalie Padiolleau", photo: "/images/membres/nathalie.jpg" },
-    { nom: "Annie Verdon", photo: "/images/membres/annie.jpg" },
+    { nom: "Hervé Barre", photo: "/images/homme.png" },
+    { nom: "Michel Belcollin", photo: "/images/homme.png" },
+    { nom: "Olivier Berland", photo: "/images/homme.png" },
+    { nom: "Jacky Belz", photo: "/images/homme.png" },
+    { nom: "Alexandra Debelle", photo: "/images/femme.png" },
+    { nom: "Régis Gypteau", photo: "/images/homme.png" },
+    { nom: "Laurent Jouffrais", photo: "/images/homme.png" },
+    { nom: "Nathalie Padiolleau", photo: "/images/femme.png" },
+    { nom: "Annie Verdon", photo: "/images/femme.png" },
   ];
 
   return (
@@ -54,7 +54,7 @@ const Comite = () => {
                 <img
                   src={membre.photo}
                   alt={membre.nom}
-                  className="w-full h-64 object-cover object-center"
+                  className="w-full h-48 object-contain object-center bg-white/5"
                 />
                 <div className="p-4">
                   <h3 className="text-xl font-bold text-white">{membre.nom}</h3>
@@ -79,7 +79,7 @@ const Comite = () => {
                 <img
                   src={president.photo}
                   alt={president.nom}
-                  className="w-full h-64 object-cover object-center"
+                  className="w-full h-48 object-contain object-center bg-white/5"
                 />
                 <div className="p-4">
                   <h3 className="text-xl font-bold text-white">{president.nom}</h3>
@@ -104,7 +104,7 @@ const Comite = () => {
                 <img
                   src={membre.photo}
                   alt={membre.nom}
-                  className="w-full h-64 object-cover object-center"
+                  className="w-full h-48 object-contain object-center bg-white/5"
                 />
                 <div className="p-4">
                   <h3 className="text-lg font-semibold">{membre.nom}</h3>

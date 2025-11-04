@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
-const ClubForm = () => {
+const ClubEditForm = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  
   const [data, setData] = useState({
     nom: "",
-     president: "",
+    president: "",
     adresse: "",
     codePostal: "",
     ville: "",
@@ -15,37 +19,56 @@ const ClubForm = () => {
   });
 
   const [logo, setLogo] = useState(null);
+  const [currentLogo, setCurrentLogo] = useState("");
   const [preview, setPreview] = useState(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
 
-  /* ------------------------------------------------------------
-     📝 Gestion des champs texte
-  ------------------------------------------------------------ */
+  // Charger les données du club
+  useEffect(() => {
+    api
+      .get(`/club/${id}`)
+      .then((res) => {
+        const club = res.data;
+        setData({
+          nom: club.nom || "",
+          president: club.president || "",
+          adresse: club.adresse || "",
+          codePostal: club.codePostal || "",
+          ville: club.ville || "",
+          email: club.email || "",
+          telephone: club.telephone || "",
+          dateAffiliation: club.dateAffiliation ? club.dateAffiliation.split('T')[0] : "",
+          adresseTerrain: club.adresseTerrain || "",
+        });
+        setCurrentLogo(club.logo || "");
+        setLoadingData(false);
+      })
+      .catch((err) => {
+        console.error("Erreur chargement club:", err);
+        setMessage("❌ Erreur lors du chargement du club");
+        setLoadingData(false);
+      });
+  }, [id]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setData((prev) => ({ ...prev, [name]: value }));
   };
 
-  /* ------------------------------------------------------------
-     🖼️ Gestion du fichier + prévisualisation
-  ------------------------------------------------------------ */
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setLogo(file);
     if (file) setPreview(URL.createObjectURL(file));
   };
 
-  /* ------------------------------------------------------------
-     🚀 Soumission du formulaire
-  ------------------------------------------------------------ */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
     setLoading(true);
 
-    // ✅ Validation basique côté client
-    if (!data.nom.trim() || !data.adresse.trim() || !data.codePostal.trim() || !data.ville.trim()) {
+    if (!data.nom.trim() || !data.adresse.trim() || !String(data.codePostal).trim() || !data.ville.trim()) {
       setMessage("❌ Merci de remplir tous les champs obligatoires.");
       setLoading(false);
       return;
@@ -56,41 +79,40 @@ const ClubForm = () => {
       Object.entries(data).forEach(([key, value]) => formData.append(key, value));
       if (logo) formData.append("logo", logo);
 
-      await api.post("/club/new", formData, {
+      await api.put(`/club/${id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      setMessage("✅ Club enregistré avec succès !");
-      setData({
-        nom: "",
-        adresse: "",
-        codePostal: "",
-        ville: "",
-        email: "",
-        telephone: "",
-        dateAffiliation: "",
-        president: "",
-        adresseTerrain: "",
-      });
-      setLogo(null);
-      setPreview(null);
+      setMessage("✅ Club modifié avec succès !");
+      setTimeout(() => navigate(`/clubs/${id}`), 2000);
     } catch (error) {
       console.error("Erreur soumission :", error);
-      setMessage("❌ Erreur lors de l’enregistrement du club.");
+      setMessage("❌ Erreur lors de la modification du club.");
     } finally {
       setLoading(false);
     }
   };
 
-  /* ------------------------------------------------------------
-     🎨 Rendu du formulaire
-  ------------------------------------------------------------ */
+  if (loadingData) {
+    return <p className="text-center mt-10 text-gray-500">Chargement...</p>;
+  }
+
   return (
     <div className="bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <section className="max-w-lg mx-auto bg-white rounded-2xl shadow-lg p-8">
         <h2 className="text-2xl font-bold text-center text-blue-700 mb-6">
-          🏛️ Créer un Club
+          ✏️ Modifier le Club
         </h2>
+
+        {message && (
+          <p
+            className={`mb-4 text-center font-semibold ${
+              message.startsWith("✅") ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            {message}
+          </p>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Nom */}
@@ -113,7 +135,7 @@ const ClubForm = () => {
           {/* Président */}
           <div>
             <label htmlFor="president" className="block mb-2 text-sm font-medium text-gray-900">
-              Président
+              Président(e)
             </label>
             <input
               type="text"
@@ -226,7 +248,7 @@ const ClubForm = () => {
                          focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
             />
           </div>
-*
+
           {/* Adresse du terrain */}
           <div>
             <label htmlFor="adresseTerrain" className="block mb-2 text-sm font-medium text-gray-900">
@@ -244,10 +266,24 @@ const ClubForm = () => {
             />
           </div>
 
-          {/* Logo */}
+          {/* Logo actuel */}
+          {currentLogo && !preview && (
+            <div>
+              <label className="block mb-2 text-sm font-medium text-gray-900">
+                Logo actuel
+              </label>
+              <img
+                src={currentLogo.startsWith('http') ? currentLogo : `${api.defaults.baseURL}${currentLogo}`}
+                alt="Logo actuel"
+                className="w-32 h-32 object-contain border border-gray-300 rounded-lg"
+              />
+            </div>
+          )}
+
+          {/* Upload nouveau logo */}
           <div>
             <label htmlFor="logo" className="block mb-2 text-sm font-medium text-gray-900">
-              Logo (optionnel)
+              {currentLogo ? "Changer le logo" : "Logo"} (optionnel)
             </label>
             <input
               type="file"
@@ -261,41 +297,35 @@ const ClubForm = () => {
             {preview && (
               <img
                 src={preview}
-                alt="Prévisualisation du logo"
-                className="mt-3 w-40 h-40 object-cover rounded-lg border shadow"
+                alt="Aperçu"
+                className="mt-3 w-32 h-32 object-contain border border-gray-300 rounded-lg"
               />
             )}
           </div>
 
-          {/* Bouton */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2.5 px-5 text-sm font-medium text-white 
-                       bg-gradient-to-r from-cyan-600 to-blue-600 
-                       hover:from-cyan-700 hover:to-blue-700 
-                       focus:ring-4 focus:ring-cyan-300 rounded-lg 
-                       transition-all duration-200"
-          >
-            {loading ? "⏳ Envoi en cours..." : "💾 Enregistrer le club"}
-          </button>
-
-          {/* Message */}
-          {message && (
-            <div
-              className={`mt-4 p-3 rounded-lg text-center font-medium ${
-                message.startsWith("✅")
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-100 text-red-700"
-              }`}
+          {/* Boutons */}
+          <div className="flex gap-4">
+            <button
+              type="submit"
+              disabled={loading}
+              className={`flex-1 text-white font-medium rounded-lg text-sm px-5 py-2.5 
+                         ${loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-700 hover:bg-blue-800"}`}
             >
-              {message}
-            </div>
-          )}
+              {loading ? "Modification..." : "💾 Enregistrer les modifications"}
+            </button>
+            
+            <button
+              type="button"
+              onClick={() => navigate(`/clubs/${id}`)}
+              className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg text-sm px-5 py-2.5"
+            >
+              Annuler
+            </button>
+          </div>
         </form>
       </section>
     </div>
   );
 };
 
-export default ClubForm;
+export default ClubEditForm;
