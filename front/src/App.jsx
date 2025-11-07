@@ -24,6 +24,9 @@ import AdminAddRencontre from "./pages/AdminCreateRencontre"
 import JourneeDetails from "./pages/JourneeSingle"
 import Classement from "./pages/Classement"
 import RechercheClubsLive from "./pages/RechercheClubsLive"
+import Register from "./pages/register"
+import UserEditForm from "./pages/EditUser"
+import TousLesUtilisateurs from "./pages/AllUsers"
 
 
 function App() {
@@ -48,16 +51,14 @@ function App() {
           <Route path="/journee/:id" element={<JourneeDetails />} />
           <Route path="/championnat/:id/classement" element={<Classement />} />
           <Route path="/rechercheClubs" element={<RechercheClubsLive />} />
+          <Route path="/register" element={<Register />} />
 
-
-
-
-          
           {/* 🔒 Routes protégées - Nécessitent une authentification admin */}
-                  <Route path="/championnats/new" element={<ProtectedRoute requireAdmin={true}><AdminCreateChampionnat /></ProtectedRoute>} />
+          <Route path="/championnats/new" element={<ProtectedRoute requireAdmin={true}><AdminCreateChampionnat /></ProtectedRoute>} />
           <Route path="/admin/championnat/:id/add-journee" element={<ProtectedRoute requireAdmin={true}><AdminAddJournee /></ProtectedRoute>} /> 
-          <Route path="/admin/journee/:id/add-rencontre" element={<AdminAddRencontre />} />
-
+          <Route path="/admin/journee/:id/add-rencontre" element={<ProtectedRoute requireAdmin={true}><AdminAddRencontre /></ProtectedRoute>} />
+          <Route path="/admin/utilisateurs" element={<ProtectedRoute requireAdmin={true}><TousLesUtilisateurs /></ProtectedRoute>} />
+          <Route path="/edit-user/:id" element={<ProtectedRoute requireAdmin={true}><UserEditForm /></ProtectedRoute>} />
           <Route 
             path="/actualite/new" 
             element={

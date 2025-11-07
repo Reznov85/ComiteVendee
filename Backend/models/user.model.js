@@ -37,14 +37,11 @@ const userSchema = new mongoose.Schema({
       type: String,
       required: false
     },
+    reportsTo: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null }
+  },
+  { timestamps: true }
+);
 
-     // Relation N️⃣-1️⃣ : un joueur appartient à un club
-  club: { type: mongoose.Schema.Types.ObjectId, ref: "Club" },
-
-  // 🔽 Nouveau champ pour hiérarchie organigramme :
-  reportsTo: { type: String, default: null },
-
-}, { timestamps: true });
 
 userSchema.pre("save", async function(){
   if(this.isModified("password")){

@@ -3,6 +3,6 @@ import { getOrganigramme } from "../controllers/organigramme.controller.js";
 
 const organigrammeRoute = express.Router();
 
-organigrammeRoute.get("/", getOrganigramme);
+organigrammeRoute.get("/organigramme", getOrganigramme);
 
 export default organigrammeRoute;

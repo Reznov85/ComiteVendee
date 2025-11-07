@@ -4,26 +4,50 @@ import User from "../models/user.model.js"
 import userValidation from "../validations/user.validation.js"
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import fs from "node:fs"
 
 const register = async(req,res)=>{
+    // le middleware va uploader l'image même si le register échoue donc on va devoir supprimer le fichier en cas d'échec
     try {
         const {body} = req
         if(!body){
+            if(req.file){
+                // suppression du fichier téléversé
+                fs.unlinkSync('./uploads/'+req.file.filename)
+            }
+            console.log(req.file.filename)
             return res.status(400).json({message: "Pas de données dans la requête"})
         }
         const {error} = userValidation(body).userCreate
         if(error){
+            if(req.file){
+                // suppression du fichier téléversé
+                fs.unlinkSync('./uploads/'+req.file.filename)
+            }
             return res.status(401).json(error.details[0].message)
         }
         const searchUser = await User.findOne({email: body.email})
         if(searchUser){
+            if(req.file){
+                // suppression du fichier téléversé
+                fs.unlinkSync('./uploads/'+req.file.filename)
+            }
             return res.status(401).json({message: "utilisateur existe déjà"})
         }
+        if(req.file){
+            // on fait en sorte que la photo contienne qqch du genre http://localhost:3000/uploads/nomdufichier.ext
+            body.photo = "http://localhost:3000/uploads/"+req.file.filename
+        }
         const user = new User(body)
+
         const newUser = await user.save()
         return res.status(201).json(newUser)        
     } catch (error) {
         console.log(error)
+        if(req.file){
+                // suppression du fichier téléversé
+                fs.unlinkSync('./uploads/'+req.file.filename)
+            }
         res.status(500).json({message: "Server error", error: error})
     }
 }
@@ -82,7 +106,7 @@ const updateUser = async(req,res) => {
     try {
         const {body} = req
         if(!body){
-            return res.status(400).json({message: "No data in the request"})
+            return res.status(400).json({message: "Utilisateur non trouvé"})
         }
 
         const {error} = userValidation(body).userUpdate
